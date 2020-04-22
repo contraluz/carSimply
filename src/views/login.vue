@@ -142,6 +142,7 @@ export default {
     }
 
     .form {
+      padding-right: 0;
       margin-top: 20px;
       .el-input__icon {
         color: #999;

@@ -23,7 +23,7 @@
         suffix-icon="el-icon-search"
         @change="handleSearch"
       ></el-input>
-      <!-- <span class="ml30">搜索客户编码：</span>
+      <span class="ml30">搜索客户编码：</span>
       <el-input
         v-model="code"
         class="keyword"
@@ -42,10 +42,16 @@
         clearable
         suffix-icon="el-icon-search"
         @change="handleSearch"
-      ></el-input> -->
-      <el-button type="primary" class="ml30" size="small" @click="handleSearch">搜索</el-button>
+      ></el-input>
     </div>
-    <el-table :data="tableData" ref="table" stripe border style="width: 100%">
+    <el-table
+      :data="tableData"
+      ref="table"
+      @select="handleSelectionChange"
+      stripe
+      border
+      style="width: 100%"
+    >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
       <el-table-column prop="id" label="客户编号" align="center"></el-table-column>
@@ -54,11 +60,11 @@
       <el-table-column prop="address" label="地址" align="center"></el-table-column>
       <el-table-column prop="ppid" label="产品物料号" align="center"></el-table-column>
       <el-table-column prop="pid" label="报价id" align="center"></el-table-column>
-      <!-- <el-table-column prop="inserttime" label="时间" show-overflow-tooltip align="center">
+      <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
         <template slot-scope="scope">
           <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
         </template>
-      </el-table-column>-->
+      </el-table-column>
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
           <el-button size="small" type="primary" @click="handleOpenEdit(scope.row)">编辑</el-button>
@@ -82,7 +88,7 @@
       <el-form ref="editform" class="form" :model="formDataEdit" label-width="120px">
         <!-- <el-form-item label="客户编号：">
           <el-input v-model="formDataEdit.id"></el-input>
-        </el-form-item> -->
+        </el-form-item>-->
         <el-form-item label="客户名称：">
           <el-input v-model="formDataEdit.name"></el-input>
         </el-form-item>
@@ -95,11 +101,25 @@
         <el-form-item label="地址：">
           <el-input v-model="formDataEdit.address"></el-input>
         </el-form-item>
-        <el-form-item label="产品物料号：">
-          <el-input v-model="formDataEdit.ppid"></el-input>
-        </el-form-item>
         <el-form-item label="报价：">
-          <el-input v-model="formDataEdit.pid"></el-input>
+          <el-select v-model="formDataEdit.pid" placeholder="请选择报价" @change="handleChangePid">
+            <el-option
+              v-for="(item, index) in allpid"
+              :key="index"
+              :label="item.id"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产品物料号：">
+          <el-select v-model="formDataEdit.ppid" placeholder="请选择产品物料号">
+            <el-option
+              v-for="(item, index) in allppid"
+              :key="index"
+              :label="item.ppid"
+              :value="item.ppid"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -130,11 +150,25 @@
         <el-form-item label="地址：">
           <el-input v-model="formDataAdd.address"></el-input>
         </el-form-item>
-        <el-form-item label="产品物料号：">
-          <el-input v-model="formDataAdd.ppid"></el-input>
-        </el-form-item>
         <el-form-item label="报价：">
-          <el-input v-model="formDataAdd.pid"></el-input>
+          <el-select v-model="formDataAdd.pid" placeholder="请选择报价" @change="handleChangePid">
+            <el-option
+              v-for="(item, index) in allpid"
+              :key="index"
+              :label="item.id"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="产品物料号：">
+          <el-select v-model="formDataAdd.ppid" placeholder="请选择产品物料号">
+            <el-option
+              v-for="(item, index) in allppid"
+              :key="index"
+              :label="item.ppid"
+              :value="item.ppid"
+            ></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -146,10 +180,16 @@
 </template>
 
 <script>
-import { mapListAccount } from "@/api/indexPage";
-
+import {
+  mapListAccount,
+  listProduct,
+  deleteAccount,
+  insertAccount,
+  updateAccount
+} from "@/api/indexPage";
+import moment from "moment";
 export default {
-  name: "",
+  name: "customer",
   data() {
     return {
       page: 1,
@@ -164,7 +204,10 @@ export default {
       editDialogVisible: false,
       addDialogVisible: false,
       formDataEdit: {},
-      formDataAdd: {}
+      formDataAdd: {},
+      allProduct: [],
+      allppid: [],
+      allpid: []
     };
   },
   components: {},
@@ -176,11 +219,13 @@ export default {
       this.page = val;
       this.handleSearch();
     },
+    handleChangePid(val) {
+      this.allppid = this.allProduct.filter(item => item.id === val);
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     handleCloseAdd() {
-      this.tagsAdd = [];
       this.addDialogTime = "";
       this.addDialogVisible = false;
     },
@@ -190,9 +235,7 @@ export default {
     },
     handleSubmitAdd() {
       const param = this.formDataAdd;
-      param.outTime = this.tagsAdd.map(item => item.label).join();
-      insertSfcOwnerRelease(param).then(res => {
-        this.tagsAdd = [];
+      insertAccount(param).then(res => {
         if (res.code === 200) {
           this.$message({
             type: "success",
@@ -214,11 +257,12 @@ export default {
     handleOpenEdit(row) {
       console.log(row);
       this.formDataEdit = Object.assign({}, row);
+      this.handleChangePid(this.formDataEdit.pid);
       this.editDialogVisible = true;
     },
     handleSubmitEdit() {
       const param = this.formDataEdit;
-      updateSfcOwnerRelease(param).then(res => {
+      updateAccount(param).then(res => {
         if (res.code === 200) {
           this.$message({
             type: "success",
@@ -251,7 +295,7 @@ export default {
           const param = {
             id: this.multipleSelection.map(item => item.id).join()
           };
-          deleteSfcOwnerRelease(param).then(res => {
+          deleteAccount(param).then(res => {
             if (res.code === 200) {
               this.$refs.table.clearSelection();
               this.$message({
@@ -286,6 +330,19 @@ export default {
     }
   },
   mounted() {
+    listProduct().then(res => {
+      if (res.code === 200 && res.data) {
+        this.allProduct = res.data;
+        let singleArr = res.data.map(item => item.id);
+        singleArr = [...new Set(singleArr)];
+        const allpid = singleArr.map(item => {
+          return res.data.find(i => {
+            return i.id === item;
+          });
+        });
+        this.allpid = allpid;
+      }
+    });
     this.handleSearch();
   }
 };
