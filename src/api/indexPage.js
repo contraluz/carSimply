@@ -121,8 +121,8 @@ export const updateProduct = function ({
   return instance.post(`springBootSwagger/updateProduct?id=${id}&typen=${typen}&typew=${typew}&num=${num}&ppid=${ppid}`)
 }
 
-export const deleteProduct = function ({ id }) {
-  return instance.post(`springBootSwagger/deleteProduct?id=${id}`)
+export const deleteProduct = function ({ id, ppid }) {
+  return instance.post(`springBootSwagger/deleteProduct?id=${id}&ppid=${ppid}`)
 }
 
 // ------------------------
@@ -255,9 +255,30 @@ export const updateShenPi = function ({
   id,
   cqid,
   remake,
-  type
+  type,
+  uidS,
+  uid
 }) {
-  return instance.get(`springBootSwagger/updateShenPi?id=${id}&cqid=${cqid}&remake=${remake}&type=${type}`)
+  return instance.get(`springBootSwagger/updateShenPi?id=${id}&cqid=${cqid}&remake=${remake}&type=${type}&uidS=${uidS}&uid=${uid}`)
 }
 
+// ------------------------
+// 弹窗列表
 
+export const listProductS = function ({
+  id
+}) {
+  return instance.post(`springBootSwagger/listProductS?id=${id}`)
+}
+
+export const listAllPricing = function ({
+  id
+}) {
+  return instance.get(`springBootSwagger/listAllPricing?id=${id}`)
+}
+
+export const listProductE = function ({
+  id
+}) {
+  return instance.get(`springBootSwagger/listProductE?id=${id}`)
+}

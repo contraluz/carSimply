@@ -43,18 +43,13 @@
       style="width: 100%"
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
-      <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
-      <el-table-column prop="id" label="合同编号" align="center"></el-table-column>
-      <el-table-column prop="uid" label="用户" align="center">
+      <!-- <el-table-column type="index" width="80" label="序号" align="center"></el-table-column> -->
+      <el-table-column prop="id" label="合同编号" align="center">
         <template slot-scope="scope">
-          <span>{{allUser.find(item => item.idUser === scope.row.uid).username}}</span>
+          <span style="cursor: pointer" @click="handleDetailLook(scope.row)">{{scope.row.id}}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="aid" label="客户" align="center">
-        <template slot-scope="scope">
-          <span>{{allAccount.find(item => item.id === scope.row.aid).name}}</span>
-        </template>
-      </el-table-column>
+      <el-table-column prop="name" label="客户" align="center"></el-table-column>
       <el-table-column prop="mode" label="寄运方式" align="center"></el-table-column>
       <el-table-column prop="payment" label="付款方式" align="center"></el-table-column>
       <el-table-column prop="appointment" label="金额" align="center"></el-table-column>
@@ -64,9 +59,23 @@
           <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="140">
+      <el-table-column prop="num" label="数量" align="center"></el-table-column>
+      <el-table-column prop="typen" label="内部型号" align="center"></el-table-column>
+      <el-table-column prop="typew" label="外部型号" align="center"></el-table-column>
+      <el-table-column prop="type" label="定价类型" align="center"></el-table-column>
+      <el-table-column prop="pice" label="单价" align="center"></el-table-column>
+      <el-table-column prop="status" label="状态" align="center">
+        <template slot-scope="scope">{{handleStatus(scope.row.status)}}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="160" align="center">
         <template slot-scope="scope">
           <el-button size="small" type="primary" @click="handleOpenEdit(scope.row)">编辑</el-button>
+          <el-button
+            size="small"
+            type="primary"
+            :disabled="scope.row.status !== 1"
+            @click="handleDownload(scope.row)"
+          >导出</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -134,10 +143,10 @@
       :before-close="handleCloseAdd"
     >
       <el-form ref="addform" class="form" :model="formDataAdd" label-width="120px">
-        <el-form-item label="合同编号">
+        <!-- <el-form-item label="合同编号">
           <el-input v-model="formDataAdd.id"></el-input>
-        </el-form-item>
-       <el-form-item label="寄运方式：">
+        </el-form-item>-->
+        <el-form-item label="寄运方式：">
           <el-input v-model="formDataAdd.mode"></el-input>
         </el-form-item>
         <el-form-item label="税率：">
@@ -175,6 +184,31 @@
         <el-button size="small" type="primary" @click="handleSubmitAdd">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog width="50%" :before-close="handleDetailClose" :visible="detailLookShow">
+      <el-table :data="detailLook">
+        <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
+        <el-table-column prop="id" label="产品物料号" align="center"></el-table-column>
+        <el-table-column prop="ppid" label="定价编号" align="center"></el-table-column>
+        <el-table-column prop="typen" label="内部型号" align="center"></el-table-column>
+        <el-table-column prop="typew" label="外部型号" align="center"></el-table-column>
+        <el-table-column prop="num" label="数量" align="center"></el-table-column>
+        <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
+          <template slot-scope="scope">
+            <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" align="center">
+          <template slot-scope="scope">{{handleStatus(scope.row.status)}}</template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+    <el-dialog :before-close="handleCloseDown" class="tinymce" id="tinymce" :visible="tinymceShow">
+      <textarea name="mytextarea" id="mytextarea" v-model="downVal"></textarea>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="small" @click="handleCloseDown">取 消</el-button>
+        <el-button size="small" type="primary" @click="handleSubmitDown">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -185,9 +219,11 @@ import {
   insertContract,
   updateContract,
   listQuoteByUserId,
-  listQuoteByAccountId
+  listQuoteByAccountId,
+  listProductS
 } from "@/api/indexPage";
 import moment from "moment";
+
 export default {
   name: "contract",
   data() {
@@ -205,11 +241,76 @@ export default {
       formDataEdit: {},
       formDataAdd: {},
       allUser: [],
-      allAccount: []
+      allAccount: [],
+      detailLook: [],
+      detailLookShow: false,
+      tinymceShow: false,
+      downVal: `
+          <p style="text-align: center;" data-mce-style="text-align: center;">合同协议</p>
+          <p style="text-align: left;" data-mce-style="text-align: left;">甲方：运输集团有限公司&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
+          <p style="text-align: left;" data-mce-style="text-align: left;">乙方：某某某</p>
+          <p>为了达成协议，完成此次任务，特签下合同作为证明。</p>
+          <p> 1.客户：（）先生/女士，客户编号是：（），雇佣运输集团有限公司为自己运送货物，总计费用是：（）元；选择的寄运方式是：（）物流/快递，选择的支付方式是：（）支付宝/微信/银行转账。</p>
+          <p>时间：————&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;时间：—————</p>
+          <p>甲方签字：————&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 乙方签字：——————</p>
+        `
     };
   },
   components: {},
   methods: {
+    handleStatus(status) {
+      let str = "";
+      switch (status) {
+        case 1:
+          str = "通过";
+          break;
+        case 2:
+          str = "未通过";
+          break;
+        case 3:
+          str = "审批中";
+          break;
+        default:
+          str = "未审批";
+          break;
+      }
+      return str;
+    },
+    handleDetailLook(row) {
+      listProductS({ id: row.id }).then(res => {
+        if (res && res.code === 200 && res.data) {
+          this.detailLook = [res.data];
+          this.detailLookShow = true;
+        }
+      });
+    },
+    handleDetailClose() {
+      this.detailLookShow = false;
+    },
+    handleDownload(row) {
+      console.log(row);
+      this.tinymceShow = true;
+      this.$nextTick(() => {
+        tinymce.init({
+          selector: "#mytextarea",
+          menu: {
+            tc: {
+              title: "TinyComments",
+              items: "addcomment showcomments deleteallconversations"
+            }
+          }
+          // menubar: "file edit view insert format tools table tc help",
+          // toolbar:
+          //   "undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment"
+        });
+      });
+    },
+    handleSubmitDown() {
+      this.tinymceShow = false;
+    },
+    handleCloseDown() {
+      this.tinymceShow = false;
+    },
     handleTimeFormat(time) {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
     },
@@ -339,5 +440,9 @@ export default {
 
 <style lang="less">
 .contract {
+}
+#mytextarea {
+  width: 100%;
+  height: 380px;
 }
 </style>

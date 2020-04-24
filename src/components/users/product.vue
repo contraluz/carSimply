@@ -44,11 +44,11 @@
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
-      <el-table-column prop="id" label="产品编号" align="center"></el-table-column>
+      <el-table-column prop="id" label="产品物料号" align="center"></el-table-column>
       <el-table-column prop="typen" label="产品内部型号" align="center"></el-table-column>
       <el-table-column prop="typew" label="产品外部型号" align="center"></el-table-column>
       <el-table-column prop="num" label="数量" align="center"></el-table-column>
-      <el-table-column prop="ppid" label="产品物料号" align="center"></el-table-column>
+      <!-- <el-table-column prop="ppid" label="产品物料号" align="center"></el-table-column> -->
       <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
         <template slot-scope="scope">
           <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
@@ -111,7 +111,7 @@
       :before-close="handleCloseAdd"
     >
       <el-form ref="addform" class="form" :model="formDataAdd" label-width="120px">
-        <el-form-item label="产品编号：">
+        <el-form-item label="产品物料号：">
           <el-input v-model="formDataAdd.id"></el-input>
         </el-form-item>
         <el-form-item label="内部型号：">
@@ -249,7 +249,8 @@ export default {
       })
         .then(() => {
           const param = {
-            id: this.multipleSelection.map(item => item.id).join()
+            id: this.multipleSelection.map(item => item.id).join(),
+            ppid: this.multipleSelection.map(item => item.ppid).join()
           };
           deleteProduct(param).then(res => {
             if (res.code === 200) {

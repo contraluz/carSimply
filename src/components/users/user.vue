@@ -8,10 +8,10 @@
       <el-table-column prop="idUser" label="权限" align="center">
         <template slot-scope="scope">
           <el-tag
-            :type="scope.row.userRole === 1 ? 'primary' : 'success'"
+            :type="handleTagColor(scope.row.userRole)"
             disable-transitions
             @click="handleRoleManage(scope.row.userRole)"
-          >{{scope.row.userRole === 1 ? '管理员' : '用户'}}</el-tag>
+          >{{handleTagName(scope.row.userRole)}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="username" label="用户名" align="center"></el-table-column>
@@ -194,6 +194,36 @@ export default {
   },
   components: {},
   methods: {
+    handleTagColor(role) {
+      let color = "";
+      switch (role) {
+        case 1:
+          color = "primary";
+          break;
+        case 2:
+          color = "success";
+          break;
+        default:
+          color = "info";
+          break;
+      }
+      return color;
+    },
+    handleTagName(role) {
+      let str = "";
+      switch (role) {
+        case 1:
+          str = "管理员";
+          break;
+        case 2:
+          str = "用户";
+          break;
+        default:
+          str = "审批员";
+          break;
+      }
+      return str;
+    },
     handleTimeFormat(time) {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
     },

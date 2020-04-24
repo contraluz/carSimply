@@ -3,7 +3,7 @@
     <el-header class="header">
       <div class="time-right">{{timeNow}}</div>
       <img src="../static/img/car.png" class="logo" alt="logo" />
-      <div class="title">顺风车后台管理系统</div>
+      <div class="title">大华CPQ配置定价报价系统</div>
     </el-header>
     <div class="login-content">
       <div class="login-title">登录</div>

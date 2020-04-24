@@ -92,13 +92,17 @@ module.exports = {
       }, {
         from: path.resolve(__dirname, './favicon.ico'),
         to: './favicon.ico'
+      }, {
+        from: path.resolve(__dirname, './src/static/js'),
+        to: './js'
       }
     ])
   ],
   devServer: {
     proxy: {
       '/springBootSwagger': {
-        target: 'http://39.100.68.171:9093/',
+        // target: 'http://39.100.68.171:9093/',
+        target: 'http://172.10.13.36:9093/',
         changeOrigin: true
       }
     }

@@ -24,13 +24,20 @@
     >
       <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
-      <el-table-column prop="id" label="价格编号" align="center"></el-table-column>
+      <el-table-column prop="id" label="定价编号" align="center">
+        <template slot-scope="scope">
+          <span style="cursor: pointer" @click="handleDetailLook(scope.row)">{{scope.row.id}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="定价类型" align="center"></el-table-column>
       <el-table-column prop="pice" label="价格" align="center"></el-table-column>
       <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
         <template slot-scope="scope">
           <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
         </template>
+      </el-table-column>
+      <el-table-column prop="status" label="状态" align="center">
+        <template slot-scope="scope">{{handleStatus(scope.row.status)}}</template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="140">
         <template slot-scope="scope">
@@ -76,7 +83,7 @@
       :before-close="handleCloseAdd"
     >
       <el-form ref="addform" class="form" :model="formDataAdd" label-width="120px">
-        <el-form-item label="价格编号">
+        <el-form-item label="定价编号：">
           <el-input v-model="formDataAdd.id"></el-input>
         </el-form-item>
         <el-form-item label="定价类型：">
@@ -91,6 +98,24 @@
         <el-button size="small" type="primary" @click="handleSubmitAdd">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog width="50%" :before-close="handleDetailClose" :visible="detailLookShow">
+      <el-table :data="detailLook">
+      <el-table-column type="index" width="80" label="序号" align="center"></el-table-column>
+      <el-table-column prop="id" label="产品物料号" align="center"></el-table-column>
+        <el-table-column prop="ppid" label="定价编号" align="center"></el-table-column>
+      <el-table-column prop="typen" label="内部型号" align="center"></el-table-column>
+      <el-table-column prop="typew" label="外部型号" align="center"></el-table-column>
+      <el-table-column prop="num" label="数量" align="center"></el-table-column>
+      <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
+        <template slot-scope="scope">
+          <span>{{handleTimeFormat(scope.row.inserttime)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="status" label="状态" align="center">
+        <template slot-scope="scope">{{handleStatus(scope.row.status)}}</template>
+      </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -99,7 +124,8 @@ import {
   mapListPricing,
   deletePricing,
   insertPricing,
-  updatePricing
+  updatePricing,
+  listAllPricing
 } from "@/api/indexPage";
 import moment from "moment";
 export default {
@@ -115,11 +141,42 @@ export default {
       editDialogVisible: false,
       addDialogVisible: false,
       formDataEdit: {},
-      formDataAdd: {}
+      formDataAdd: {},
+      detailLook:[],
+      detailLookShow: false
     };
   },
   components: {},
   methods: {
+     handleDetailLook(row) {
+      listAllPricing({ id: row.id }).then(res => {
+        if (res && res.code === 200 && res.data) {
+          this.detailLook = res.data;
+          this.detailLookShow = true;
+        }
+      });
+    },
+    handleDetailClose() {
+          this.detailLookShow = false;
+    },
+    handleStatus(status) {
+      let str = "";
+      switch (status) {
+        case 1:
+          str = "通过";
+          break;
+        case 2:
+          str = "未通过";
+          break;
+        case 3:
+          str = "审批中";
+          break;
+        default:
+          str = "未审批";
+          break;
+      }
+      return str;
+    },
     handleTimeFormat(time) {
       return moment(time).format("YYYY-MM-DD HH:mm:ss");
     },

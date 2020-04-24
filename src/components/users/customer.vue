@@ -58,8 +58,13 @@
       <el-table-column prop="name" label="客户名称" align="center"></el-table-column>
       <el-table-column prop="code" label="客户编码" align="center"></el-table-column>
       <el-table-column prop="address" label="地址" align="center"></el-table-column>
-      <el-table-column prop="ppid" label="产品物料号" align="center"></el-table-column>
-      <el-table-column prop="pid" label="报价id" align="center"></el-table-column>
+      <el-table-column prop="ppid" label="定价编号" align="center"></el-table-column>
+      <el-table-column prop="pid" label="产品物料号" align="center"></el-table-column>
+      <el-table-column prop="status" label="状态" align="center">
+        <template slot-scope="scope">
+          {{scope.row.status === 0 ? '未处理':'已处理'}}
+        </template>
+      </el-table-column>
       <el-table-column prop="inserttime" label="添加时间" show-overflow-tooltip align="center">
         <template slot-scope="scope">
           <span>{{handleTimeFormat(scope.row.inserttime)}}</span>

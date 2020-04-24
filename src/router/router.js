@@ -12,6 +12,7 @@ const price = () => import( /* webpackChunkName: "price"*/ '@/components/users/p
 const offer = () => import( /* webpackChunkName: "offer"*/ '@/components/users/offer');
 const contract = () => import( /* webpackChunkName: "contract"*/ '@/components/users/contract');
 const approval = () => import( /* webpackChunkName: "approval"*/ '@/components/users/approval');
+const tinymce = () => import( /* webpackChunkName: "tinymce"*/ '@/components/users/tinymce');
 
 const routes = [
   {
@@ -51,7 +52,13 @@ const routes = [
       name: 'approval',
       path: 'approval',
       component: approval
-    }]
+    },
+    {
+      name: 'tinymce',
+      path: 'tinymce',
+      component: tinymce
+    }
+    ]
   },
   {
     name: 'login',

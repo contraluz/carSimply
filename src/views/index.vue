@@ -3,8 +3,11 @@
     <el-header class="header">
       <img src="../static/img/exit.png" class="exit-img" alt="exit" title="安全退出" @click="exit" />
       <div class="time-right">{{timeNow}}</div>
+      <el-badge :value="alarm" v-show="alarm" class="right-badge">
+        <i class="el-icon-bell" style="cursor: pointer" @click="handleJump"></i>
+      </el-badge>
       <img src="../static/img/car.png" class="logo" alt="logo" />
-      <div class="title">顺风车后台管理系统</div>
+      <div class="title">大华CPQ配置定价报价系统</div>
     </el-header>
     <el-container class="main-container">
       <el-aside width="240px" class="aside">
@@ -29,6 +32,7 @@
 
 <script>
 import maps from "@/static/js/menu";
+import { listAllByCount } from "@/api/indexPage";
 
 export default {
   name: "index",
@@ -37,12 +41,14 @@ export default {
       timeNow: "",
       timer: 0,
       activedMenu: "",
-      menuName: []
+      menuName: [],
+      alarm: 0
     };
   },
   components: {},
   methods: {
     handleMenuSelect(val) {
+      this.activedMenu = val;
       this.$router.push(`/index/${maps[val - 1].router}`);
     },
     exit() {
@@ -58,10 +64,16 @@ export default {
           }
         })
         .catch(() => {});
+    },
+    handleJump() {
+      this.activedMenu = this.menuName[this.menuName.length - 1].id + "";
+      this.$router.push("/index/approval");
     }
   },
   mounted() {
+    let role = 1;
     if (sessionStorage) {
+      role = sessionStorage.getItem("role");
       this.menuName = JSON.parse(sessionStorage.getItem("menuName"));
       if (location.hash.split("index/")[1]) {
         const route = location.hash.split("index/")[1];
@@ -83,16 +95,33 @@ export default {
     this.timer = setInterval(() => {
       this.timeNow = moment().format("YYYY年MM月DD日 HH:mm:ss");
     }, 1000);
+    this.timer2 = setInterval(() => {
+      listAllByCount({ id: role }).then(res => {
+        if (res.code === 200 && res.data) {
+          this.alarm = res.data;
+        }
+      });
+    }, 3000);
   },
   beforeDestroy() {
     clearInterval(this.timer);
+    clearInterval(this.timer2);
   }
 };
 </script>
 
 <style lang="less">
+.right-badge {
+  float: right;
+  margin-right: 22px;
+  margin-top: 17px;
+}
 .main-container {
   overflow-y: auto;
+  .to-right {
+    float: right;
+  }
+
   .aside {
     background: #202739;
     .el-menu {
@@ -125,9 +154,7 @@ export default {
     .keyword {
       width: 180px;
     }
-    .to-right {
-      float: right;
-    }
+
     .ml30 {
       margin-left: 30px;
     }
@@ -154,5 +181,10 @@ export default {
   max-height: 400px;
   overflow-y: auto;
   padding-right: 20px;
+}
+.form-simple {
+  .el-form-item {
+    margin-bottom: 0;
+  }
 }
 </style>

@@ -6,6 +6,8 @@ import moment from "moment";
 window.moment = moment;
 Vue.use(ElementUI);
 
+import "@/static/js/tinymce.min.js";
+import "@/static/js/plugins/print/plugin.min.js";
 
 import App from './App';
 import router from './router/router'
