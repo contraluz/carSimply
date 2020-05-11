@@ -70,12 +70,7 @@
       <el-table-column label="操作" width="160" align="center">
         <template slot-scope="scope">
           <el-button size="small" type="primary" @click="handleOpenEdit(scope.row)">编辑</el-button>
-          <el-button
-            size="small"
-            type="primary"
-            :disabled="scope.row.status !== 1"
-            @click="handleDownload(scope.row)"
-          >导出</el-button>
+          <el-button size="small" type="primary" :disabled="scope.row.status !== 1" @click="handleDownload(scope.row)">导出</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -203,7 +198,8 @@
       </el-table>
     </el-dialog>
     <el-dialog :before-close="handleCloseDown" class="tinymce" id="tinymce" :visible="tinymceShow">
-      <textarea name="mytextarea" id="mytextarea" v-model="downVal"></textarea>
+      <!-- <textarea name="mytextarea" id="mytextarea" v-model="downVal"></textarea> -->
+      <!-- <Editor id="mytextarea" v-model="downVal" :init="editorInit"></Editor> -->
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="handleCloseDown">取 消</el-button>
         <el-button size="small" type="primary" @click="handleSubmitDown">确 定</el-button>
@@ -223,6 +219,12 @@ import {
   listProductS
 } from "@/api/indexPage";
 import moment from "moment";
+
+// import tinymce from "tinymce/tinymce";
+// import "tinymce/themes/silver/theme";
+// import Editor from "@tinymce/tinymce-vue";
+// import"tinymce/plugins/save";
+// import"tinymce/plugins/print";
 
 export default {
   name: "contract",
@@ -244,16 +246,7 @@ export default {
       allAccount: [],
       detailLook: [],
       detailLookShow: false,
-      tinymceShow: false,
-      downVal: `
-          <p style="text-align: center;" data-mce-style="text-align: center;">合同协议</p>
-          <p style="text-align: left;" data-mce-style="text-align: left;">甲方：运输集团有限公司&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>
-          <p style="text-align: left;" data-mce-style="text-align: left;">乙方：某某某</p>
-          <p>为了达成协议，完成此次任务，特签下合同作为证明。</p>
-          <p> 1.客户：（）先生/女士，客户编号是：（），雇佣运输集团有限公司为自己运送货物，总计费用是：（）元；选择的寄运方式是：（）物流/快递，选择的支付方式是：（）支付宝/微信/银行转账。</p>
-          <p>时间：————&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;时间：—————</p>
-          <p>甲方签字：————&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 乙方签字：——————</p>
-        `
+      tinymceShow: false
     };
   },
   components: {},
@@ -289,21 +282,11 @@ export default {
     },
     handleDownload(row) {
       console.log(row);
-      this.tinymceShow = true;
-      this.$nextTick(() => {
-        tinymce.init({
-          selector: "#mytextarea",
-          menu: {
-            tc: {
-              title: "TinyComments",
-              items: "addcomment showcomments deleteallconversations"
-            }
-          }
-          // menubar: "file edit view insert format tools table tc help",
-          // toolbar:
-          //   "undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment"
-        });
-      });
+      // this.tinymceShow = true;
+      this.$router.push({ path: "/index/tinymce", query: row });
+      // this.$nextTick(() => {
+      //   tinymce.init({});
+      // });
     },
     handleSubmitDown() {
       this.tinymceShow = false;
@@ -438,11 +421,3 @@ export default {
 };
 </script>
 
-<style lang="less">
-.contract {
-}
-#mytextarea {
-  width: 100%;
-  height: 380px;
-}
-</style>

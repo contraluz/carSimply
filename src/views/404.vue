@@ -2,7 +2,7 @@
   <div class="notFound">
     <el-header class="header">
       <div class="time-right">{{timeNow}}</div>
-      <img src="../static/img/car.png" class="logo" alt="logo" />
+      <!-- <img src="../static/img/car.png" class="logo" alt="logo" /> -->
       <div class="title">大华CPQ配置定价报价系统</div>
     </el-header>
     <h1>啊呀，页面走丢了！</h1>

@@ -106,8 +106,8 @@
         <el-form-item label="地址：">
           <el-input v-model="formDataEdit.address"></el-input>
         </el-form-item>
-        <el-form-item label="报价：">
-          <el-select v-model="formDataEdit.pid" placeholder="请选择报价" @change="handleChangePid">
+        <el-form-item label="产品物料号：">
+          <el-select v-model="formDataEdit.pid" placeholder="请选择产品物料号" @change="handleChangePid">
             <el-option
               v-for="(item, index) in allpid"
               :key="index"
@@ -116,8 +116,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="产品物料号：">
-          <el-select v-model="formDataEdit.ppid" placeholder="请选择产品物料号">
+        <el-form-item label="定价编号：">
+          <el-select v-model="formDataEdit.ppid" placeholder="请选择定价编号">
             <el-option
               v-for="(item, index) in allppid"
               :key="index"
@@ -155,8 +155,8 @@
         <el-form-item label="地址：">
           <el-input v-model="formDataAdd.address"></el-input>
         </el-form-item>
-        <el-form-item label="报价：">
-          <el-select v-model="formDataAdd.pid" placeholder="请选择报价" @change="handleChangePid">
+        <el-form-item label="产品物料号：">
+          <el-select v-model="formDataAdd.pid" placeholder="请选择产品物料号" @change="handleChangePid">
             <el-option
               v-for="(item, index) in allpid"
               :key="index"
@@ -165,8 +165,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="产品物料号：">
-          <el-select v-model="formDataAdd.ppid" placeholder="请选择产品物料号">
+        <el-form-item label="定价编号：">
+          <el-select v-model="formDataAdd.ppid" placeholder="请选择定价编号">
             <el-option
               v-for="(item, index) in allppid"
               :key="index"

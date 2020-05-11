@@ -41,7 +41,7 @@
         <!-- <el-form-item label="客户编号：">
           <el-input v-model="formDataEdit.id"></el-input>
         </el-form-item>-->
-        <div v-show="infoType">
+        <div v-show="infoType === '报价'">
           <el-form-item label="客户名：">{{formDataEdit.name}}</el-form-item>
           <el-form-item label="价格：">{{formDataEdit.pice}}</el-form-item>
           <el-form-item label="数量：">{{formDataEdit.num}}</el-form-item>
@@ -50,13 +50,22 @@
           <el-form-item label="添加时间：">{{handleTimeFormat(formDataEdit.inserttime)}}</el-form-item>
           <el-form-item label="审批：">{{handleStatus(formDataEdit.status)}}</el-form-item>
         </div>
-        <div v-show="!infoType">
+        <div v-show="infoType === '合同'">
           <el-form-item label="客户名：">{{formDataEdit.name}}</el-form-item>
           <el-form-item label="寄运方式：">{{formDataEdit.mode}}</el-form-item>
           <el-form-item label="付款方式：">{{formDataEdit.payment}}</el-form-item>
           <el-form-item label="税率：">{{formDataEdit.tax}}</el-form-item>
           <el-form-item label="金额：">{{formDataEdit.appointment}}</el-form-item>
           <el-form-item label="添加时间：">{{handleTimeFormat(formDataEdit.inserttime)}}</el-form-item>
+          <el-form-item label="审批：">{{handleStatus(formDataEdit.status)}}</el-form-item>
+        </div>
+        <div v-show="infoType === '定价'">
+          <el-form-item label="客户名：">{{formDataEdit.name}}</el-form-item>
+          <el-form-item label="数量：">{{formDataEdit.num}}</el-form-item>
+          <el-form-item label="单价：">{{formDataEdit.pice}}</el-form-item>
+          <el-form-item label="类型：">{{formDataEdit.type}}</el-form-item>
+          <el-form-item label="内部型号：">{{formDataEdit.typen}}</el-form-item>
+          <el-form-item label="外部型号：">{{formDataEdit.typew}}</el-form-item>
           <el-form-item label="审批：">{{handleStatus(formDataEdit.status)}}</el-form-item>
         </div>
       </el-form>
@@ -133,7 +142,7 @@ export default {
       formDataEdit: {},
       addDialogVisible: false,
       formDataAdd: {},
-      infoType: true,
+      infoType: "报价",
       allUser: []
     };
   },
@@ -199,7 +208,7 @@ export default {
     },
     handleOpenEdit(row) {
       console.log(row);
-      this.infoType = row.type === "报价";
+      this.infoType = row.type;
       const param = {
         cqid: row.cqid,
         type: row.type

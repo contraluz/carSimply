@@ -6,7 +6,7 @@
       <el-badge :value="alarm" v-show="alarm" class="right-badge">
         <i class="el-icon-bell" style="cursor: pointer" @click="handleJump"></i>
       </el-badge>
-      <img src="../static/img/car.png" class="logo" alt="logo" />
+      <!-- <img src="../static/img/car.png" class="logo" alt="logo" /> -->
       <div class="title">大华CPQ配置定价报价系统</div>
     </el-header>
     <el-container class="main-container">
@@ -77,9 +77,11 @@ export default {
       this.menuName = JSON.parse(sessionStorage.getItem("menuName"));
       if (location.hash.split("index/")[1]) {
         const route = location.hash.split("index/")[1];
-        const activeID = maps.find(item => {
-          return item.router === route;
-        }).id;
+        const activeID = (
+          maps.find(item => {
+            return item.router === route;
+          }) || { id: 6 }
+        ).id;
         this.activedMenu = activeID + "";
       } else {
         this.activedMenu = this.menuName[0].id + "";
