@@ -334,7 +334,7 @@ export default {
       this.editDialogVisible = false;
     },
     handleOpenEdit(row) {
-      this.formDataEdit = Object.assign(row);
+      this.formDataEdit = Object.assign({}, row);
       this.editDialogVisible = true;
     },
     handleSubmitEdit() {
